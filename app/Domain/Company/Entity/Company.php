@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Company\Entity;
 
+use Domain\Company\Exceptions\InsufficientCompanyBalanceException;
+use Domain\Company\Exceptions\InvalidCompanyAttributeException;
 use Domain\Shared\ValueObjects\Money;
-use InvalidArgumentException;
 
 final class Company
 {
@@ -35,7 +36,7 @@ final class Company
     public function credit(Money $amount): void
     {
         if ($amount->toCents() <= 0) {
-            throw new InvalidArgumentException('Deposit amount must be greater than zero.');
+            throw new InvalidCompanyAttributeException('Deposit amount must be greater than zero.');
         }
 
         $this->balance = $this->balance->add($amount);
@@ -44,28 +45,28 @@ final class Company
     public function debit(Money $amount): void
     {
         if ($amount->toCents() <= 0) {
-            throw new InvalidArgumentException('Amount to debit must be greater than zero.');
+            throw new InvalidCompanyAttributeException('Amount to debit must be greater than zero.');
         }
 
         if ($this->balance->isLessThan($amount)) {
-            throw new InvalidArgumentException('Insufficient company balance.');
+            throw new InsufficientCompanyBalanceException();
         }
 
         $this->balance = $this->balance->subtract($amount);
     }
 
-    private function validate(string $id, string $name): void
+    private function validate(string $id, string $name, Money $balance): void
     {
         if (trim($id) === '') {
-            throw new InvalidArgumentException('Company ID cannot be empty.');
+            throw new InvalidCompanyAttributeException('Company ID cannot be empty.');
         }
 
         if (trim($name) === '') {
-            throw new InvalidArgumentException('Company name cannot be empty.');
+            throw new InvalidCompanyAttributeException('Company name cannot be empty.');
         }
 
-        if ($this->balance->toCents() < 0) {
-            throw new InvalidArgumentException('Company balance cannot be negative.');
+        if ($balance->toCents() < 0) {
+            throw new InvalidCompanyAttributeException('Company balance cannot be negative.');
         }
     }
 }

@@ -125,13 +125,13 @@ CARD ||--o{ TRANSACTION : registers
 
 ```
 
-1.   **Company**: Representa a empresa Acme, controlando o saldo geral
+    1. **Company**: Representa a empresa Acme, controlando o saldo geral
      disponível e emitindo cartões para seus funcionários.
 
-2.   **User**: Armazena os dados de autenticação e perfil dos portadores dos
+    2. **User**: Armazena os dados de autenticação e perfil dos portadores dos
      cartões e da gestora financeira (Marina).
 
-3.   **Card**: Define as regras contratuais e de limite de cada funcionário
+    3. **Card**: Define as regras contratuais e de limite de cada funcionário
      (teto por compra, limite mensal, status de bloqueio e MCCs
      restritos).
 
@@ -139,7 +139,6 @@ CARD ||--o{ TRANSACTION : registers
 
     garantindo idempotência e guardando o status da decisão e o motivo
     de recusa.
-
 
 
     5. **Event**: Captura eventos assíncronos enviados pela rede (capturas
@@ -153,8 +152,6 @@ CARD ||--o{ TRANSACTION : registers
 ## 2. Decisões
 
 De três a cinco. Para cada uma: o que você decidiu, a alternativa que rejeitou, e o motivo.
-
-## 2. Decisões
 
 1.  **Ledger Imutável com Transações Compensatórias**
 
@@ -198,7 +195,6 @@ Antes de implementar, para S2, S4 e S5: o resultado que você espera e por quê.
 
     -   _Resultado após rodar:_ (A preencher após execução dos testes).
 
-
 - **S4 (Capturas Múltiplas e Tolerância MCC 7011):**
 
     - _Expectativa:_ As três capturas (300 + 300 + 260 = 860) sobre uma autorização de 800 serão aceitas progressivamente, consumindo as reservas e aplicando o total dentro da tolerância de 20% permitida para o MCC 7011.
@@ -214,6 +210,10 @@ Antes de implementar, para S2, S4 e S5: o resultado que você espera e por quê.
 ## 4. O que mudou e o que foi descartado
 
 Alterações relevantes do modelo ao longo do caminho, com o motivo. E o que o seu primeiro rascunho, ou a IA, propôs e você não aceitou.
+
+- **Descartado — Capturas que Consomem Autorizações Pendentes Sem Transações Compensatórias (_Estratégia B_):**
+    - _O que foi avaliado:_ Permitir que a autorização gerasse um registro/transação pendente de reserva para travar o limite, mas fazer com que a chegada da captura consumisse ou fechasse diretamente essa autorização pendente, sem emitir transações explícitas de liberação (`release`) combinadas com novos lançamentos de captura (`capture`).
+    - _Por que foi descartado:_ Embora reduza o número de linhas no Ledger, essa abordagem torna complexa a rastreabilidade em cenários de capturas parciais, múltiplas capturas ou divergências de valores (como a tolerância de 20% em determinados MCCs), onde é muito mais transparente e auditável possuir uma trilha linear e imutável de compensações (estorno da reserva e efetivação do gasto).
 
 - **Descartado — Contabilidade por Partidas Dobradas com Contas Transitórias (_Clearing Accounts_):** Avaliado o uso de modelos contábeis estritos (inspirados em Beancount). Foi descartado por gerar _over-engineering_ para um sistema de controle de pré-pago em PHP, quebrando a linearidade direta exigida no JSON de extrato da Etapa 3 e elevando a barreira cognitiva para manutenção.
 

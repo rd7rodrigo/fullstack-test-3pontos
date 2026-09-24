@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Domain\Company\Entity\Company;
+use Domain\Company\Exceptions\InsufficientCompanyBalanceException;
+use Domain\Company\Exceptions\InvalidCompanyAttributeException;
 use Domain\Shared\ValueObjects\Money;
 
 // Testa se a empresa pode ser instanciada corretamente com o saldo inicial (ex: R$ 10.000,00 da Acme)
@@ -55,35 +57,35 @@ test('it throws exception when debiting more than company available balance', fu
     );
 
     expect(fn () => $company->debit(Money::fromCents(10000))) // Tenta debitar R$ 100,00
-        ->toThrow(InvalidArgumentException::class, 'Insufficient company balance.');
+        ->toThrow(InsufficientCompanyBalanceException::class, 'Insufficient company balance.');
 });
 
 // Testa se lança exceção ao tentar criar uma empresa com ID vazio
 test('it throws exception when company id is empty', function () {
     expect(fn () => new Company(id: '', name: 'Acme Corp', balance: Money::fromCents(1000000)))
-        ->toThrow(InvalidArgumentException::class, 'Company ID cannot be empty.');
+        ->toThrow(InvalidCompanyAttributeException::class, 'Company ID cannot be empty.');
 });
 
 // Testa se lança exceção ao tentar criar uma empresa com ID contendo apenas espaços em branco
 test('it throws exception when company id is blank', function () {
     expect(fn () => new Company(id: '   ', name: 'Acme Corp', balance: Money::fromCents(1000000)))
-        ->toThrow(InvalidArgumentException::class, 'Company ID cannot be empty.');
+        ->toThrow(InvalidCompanyAttributeException::class, 'Company ID cannot be empty.');
 });
 
 // Testa se lança exceção ao tentar criar uma empresa com nome vazio
 test('it throws exception when company name is empty', function () {
     expect(fn () => new Company(id: 'comp_acme', name: '', balance: Money::fromCents(1000000)))
-        ->toThrow(InvalidArgumentException::class, 'Company name cannot be empty.');
+        ->toThrow(InvalidCompanyAttributeException::class, 'Company name cannot be empty.');
 });
 
 // Testa se lança exceção ao tentar criar uma empresa com nome contendo apenas espaços em branco
 test('it throws exception when company name is blank', function () {
     expect(fn () => new Company(id: 'comp_acme', name: '   ', balance: Money::fromCents(1000000)))
-        ->toThrow(InvalidArgumentException::class, 'Company name cannot be empty.');
+        ->toThrow(InvalidCompanyAttributeException::class, 'Company name cannot be empty.');
 });
 
 // Testa se lança exceção ao tentar criar uma empresa com saldo inicial negativo
 test('it throws exception when initial balance is negative', function () {
     expect(fn () => new Company(id: 'comp_acme', name: 'Acme Corp', balance: Money::fromCents(-100)))
-        ->toThrow(InvalidArgumentException::class, 'Company balance cannot be negative.');
+        ->toThrow(InvalidCompanyAttributeException::class, 'Company balance cannot be negative.');
 });
