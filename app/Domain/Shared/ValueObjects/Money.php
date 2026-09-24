@@ -45,6 +45,11 @@ final readonly class Money
         return $this->cents >= $other->toCents();
     }
 
+    public function isGreaterThan(self $other): bool
+    {
+        return $this->cents > $other->toCents();
+    }
+
     public function isZero(): bool
     {
         return $this->cents === 0;
