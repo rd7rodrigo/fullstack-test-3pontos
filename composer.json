@@ -39,7 +39,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Domain\\Shared\\ValueObjects\\": "app/Domain/Shared/ValueObjects/"
+            "Domain\\": "app/Domain/"
         }
     },
     "autoload-dev": {

@@ -8,10 +8,7 @@ final readonly class Money
 {
     public function __construct(
         private int $cents
-    ) {
-        // Se a regra permitir saldo zero ou positivo, podemos validar aqui,
-        // mas o Ledger gerencia se o saldo pode ficar negativo ou não.
-    }
+    ) {}
 
     public static function fromCents(int $cents): self
     {
@@ -36,6 +33,11 @@ final readonly class Money
     public function equals(self $other): bool
     {
         return $this->cents === $other->toCents();
+    }
+
+    public function isLessThan(self $other): bool
+    {
+        return $this->cents < $other->toCents();
     }
 
     public function isGreaterThanOrEqual(self $other): bool
